@@ -27,6 +27,24 @@
 
 namespace redis {
 
+class CommandBZMPop : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
+class CommandBZMPopMax : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
+class CommandBZMPopMin : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
 class CommandZAdd : public Commander {
  public:
   Status Parse(const std::vector<std::string> &args) override {
@@ -164,6 +182,18 @@ class CommandZCard : public Commander {
   }
 };
 
+class CommandZDiff : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
+class CommandZDiffStore : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
 class CommandZIncrBy : public Commander {
  public:
   Status Parse(const std::vector<std::string> &args) override {
@@ -191,6 +221,18 @@ class CommandZIncrBy : public Commander {
   double incr_ = 0.0;
 };
 
+class CommandZInter : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
+class CommandZInterCard : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override {}
+  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+};
+
 class CommandZLexCount : public Commander {
  public:
   Status Parse(const std::vector<std::string> &args) override {
@@ -216,6 +258,15 @@ class CommandZLexCount : public Commander {
 
  private:
   RangeLexSpec spec_;
+};
+
+class CommandZMPop : public Commander {
+ public:
+  explicit CommandZMPop() = default;
+
+  Status Parse(const std::vector<std::string> &args) override { return Commander::Parse(args); }
+
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZPop : public Commander {
@@ -414,7 +465,7 @@ class CommandZRange : public CommandZRangeGeneric {
 
 class CommandZRevRange : public CommandZRangeGeneric {
  public:
-  CommandZRevRange() : CommandZRangeGeneric(kZRangeRank, kZRangeDirectionReverse) {}
+  explicit CommandZRevRange() : CommandZRangeGeneric(kZRangeRank, kZRangeDirectionReverse) {}
 };
 
 class CommandZRangeByLex : public CommandZRangeGeneric {
@@ -424,7 +475,7 @@ class CommandZRangeByLex : public CommandZRangeGeneric {
 
 class CommandZRevRangeByLex : public CommandZRangeGeneric {
  public:
-  CommandZRevRangeByLex() : CommandZRangeGeneric(kZRangeLex, kZRangeDirectionReverse) {}
+  explicit CommandZRevRangeByLex() : CommandZRangeGeneric(kZRangeLex, kZRangeDirectionReverse) {}
 };
 
 class CommandZRangeByScore : public CommandZRangeGeneric {
@@ -434,7 +485,7 @@ class CommandZRangeByScore : public CommandZRangeGeneric {
 
 class CommandZRevRangeByScore : public CommandZRangeGeneric {
  public:
-  CommandZRevRangeByScore() : CommandZRangeGeneric(kZRangeScore, kZRangeDirectionReverse) {}
+  explicit CommandZRevRangeByScore() : CommandZRangeGeneric(kZRangeScore, kZRangeDirectionReverse) {}
 };
 
 class CommandZRank : public Commander {
@@ -737,12 +788,20 @@ class CommandZScan : public CommandSubkeyScanBase {
   }
 };
 
-REDIS_REGISTER_COMMANDS(MakeCmdAttr<CommandZAdd>("zadd", -4, "write", 1, 1, 1),
+REDIS_REGISTER_COMMANDS(MakeCmdAttr<CommandBZMPop>("bzmpop", -5, "write", 1, 1, 1),
+                        MakeCmdAttr<CommandBZMPopMax>("bzmpopmax", -3, "write", 1, 1, 1),
+                        MakeCmdAttr<CommandBZMPopMin>("bzmpopmin", -3, "write", 1, 1, 1),
+                        MakeCmdAttr<CommandZAdd>("zadd", -4, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZCard>("zcard", 2, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZCount>("zcount", 4, "read-only", 1, 1, 1),
+                        MakeCmdAttr<CommandZDiff>("zdiff", -4, "read-only", 1, 1, 1),
+                        MakeCmdAttr<CommandZDiffStore>("zdiffstore", -4, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZIncrBy>("zincrby", 4, "write", 1, 1, 1),
+                        MakeCmdAttr<CommandZInter>("zinter", -4, "read-only", 1, 1, 1),
+                        MakeCmdAttr<CommandZInterCard>("zintercard", -4, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZInterStore>("zinterstore", -4, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZLexCount>("zlexcount", 4, "read-only", 1, 1, 1),
+                        MakeCmdAttr<CommandZMPop>("zmpop", -4, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZPopMax>("zpopmax", -2, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZPopMin>("zpopmin", -2, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZRange>("zrange", -4, "read-only", 1, 1, 1),
