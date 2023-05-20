@@ -406,44 +406,50 @@ func TestSlotMigrateSync(t *testing.T) {
 	require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
 
 	slot := -1
-	t.Run("MIGRATE - Cannot migrate async with timeout", func(t *testing.T) {
-		slot++
-		require.Error(t, rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "async", 1).Err())
-	})
+	t_begin := time.Now()
+	for i := 1; i < 10; i++ {
+		t.Run("MIGRATE - Cannot migrate async with timeout", func(t *testing.T) {
+			slot++
+			require.Error(t, rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "async", 1).Err())
+		})
 
-	t.Run("MIGRATE - Migrate sync with (or without) all kinds of timeouts", func(t *testing.T) {
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync").Val())
+		t.Run("MIGRATE - Migrate sync with (or without) all kinds of timeouts", func(t *testing.T) {
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync").Val())
 
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -1).Val())
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -1).Val())
 
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0).Val())
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0).Val())
 
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 10).Val())
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 10).Val())
 
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0.5).Val())
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0.5).Val())
 
-		slot++
-		require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -3.14).Val())
-	})
+			slot++
+			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -3.14).Val())
+		})
 
-	t.Run("MIGRATE - Migrate sync timeout", func(t *testing.T) {
-		cnt := 200000
-		slot++
-		for i := 0; i < cnt; i++ {
-			require.NoError(t, rdb0.LPush(ctx, util.SlotTable[slot], i).Err())
-		}
-		timeout := 0.001
+		t.Run("MIGRATE - Migrate sync timeout", func(t *testing.T) {
+			cnt := 200000
+			slot++
+			for i := 0; i < cnt; i++ {
+				require.NoError(t, rdb0.LPush(ctx, util.SlotTable[slot], i).Err())
+			}
+			timeout := 0.001
 
-		require.Nil(t, rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout).Val())
+			require.Nil(t, rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout).Val())
 
-		// check the following command on the same connection
-		require.Equal(t, "PONG", rdb0.Ping(ctx).Val())
-	})
+			// check the following command on the same connection
+			require.Equal(t, "PONG", rdb0.Ping(ctx).Val())
+		})
+	}
+	t_end := time.Now()
+	duration := t_end.Sub(t_begin)
+	fmt.Println("MIGRATE duration: ", duration)
 }
 
 func TestSlotMigrateDataType(t *testing.T) {
