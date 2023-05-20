@@ -384,30 +384,29 @@ func TestSlotMigrateThreeNodes(t *testing.T) {
 }
 
 func TestSlotMigrateSync(t *testing.T) {
-	ctx := context.Background()
+	for i := 0; i < 10; i++ {
+		ctx := context.Background()
 
-	srv0 := util.StartServer(t, map[string]string{"cluster-enabled": "yes"})
-	defer func() { srv0.Close() }()
-	rdb0 := srv0.NewClientWithOption(&redis.Options{PoolSize: 1})
-	defer func() { require.NoError(t, rdb0.Close()) }()
-	id0 := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx00"
-	require.NoError(t, rdb0.Do(ctx, "clusterx", "SETNODEID", id0).Err())
+		srv0 := util.StartServer(t, map[string]string{"cluster-enabled": "yes"})
+		defer func() { srv0.Close() }()
+		rdb0 := srv0.NewClientWithOption(&redis.Options{PoolSize: 1})
+		defer func() { require.NoError(t, rdb0.Close()) }()
+		id0 := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx00"
+		require.NoError(t, rdb0.Do(ctx, "clusterx", "SETNODEID", id0).Err())
 
-	srv1 := util.StartServer(t, map[string]string{"cluster-enabled": "yes"})
-	defer func() { srv1.Close() }()
-	rdb1 := srv1.NewClientWithOption(&redis.Options{PoolSize: 1})
-	defer func() { require.NoError(t, rdb1.Close()) }()
-	id1 := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx01"
-	require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODEID", id1).Err())
+		srv1 := util.StartServer(t, map[string]string{"cluster-enabled": "yes"})
+		defer func() { srv1.Close() }()
+		rdb1 := srv1.NewClientWithOption(&redis.Options{PoolSize: 1})
+		defer func() { require.NoError(t, rdb1.Close()) }()
+		id1 := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx01"
+		require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODEID", id1).Err())
 
-	clusterNodes := fmt.Sprintf("%s %s %d master - 0-8191\n", id0, srv0.Host(), srv0.Port())
-	clusterNodes += fmt.Sprintf("%s %s %d master - 8192-16383", id1, srv1.Host(), srv1.Port())
-	require.NoError(t, rdb0.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
-	require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
+		clusterNodes := fmt.Sprintf("%s %s %d master - 0-8191\n", id0, srv0.Host(), srv0.Port())
+		clusterNodes += fmt.Sprintf("%s %s %d master - 8192-16383", id1, srv1.Host(), srv1.Port())
+		require.NoError(t, rdb0.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
+		require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
 
-	slot := -1
-	tBegin := time.Now()
-	for i := 1; i < 10; i++ {
+		slot := -1
 		t.Run("MIGRATE - Cannot migrate async with timeout", func(t *testing.T) {
 			slot++
 			require.Error(t, rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "async", 1).Err())
@@ -447,9 +446,6 @@ func TestSlotMigrateSync(t *testing.T) {
 			require.Equal(t, "PONG", rdb0.Ping(ctx).Val())
 		})
 	}
-	tEnd := time.Now()
-	duration := tEnd.Sub(tBegin)
-	fmt.Println("MIGRATE duration: ", duration)
 }
 
 func TestSlotMigrateDataType(t *testing.T) {
