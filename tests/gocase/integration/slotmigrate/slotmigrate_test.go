@@ -406,7 +406,7 @@ func TestSlotMigrateSync(t *testing.T) {
 	require.NoError(t, rdb1.Do(ctx, "clusterx", "SETNODES", clusterNodes, "1").Err())
 
 	slot := -1
-	t_begin := time.Now()
+	tBegin := time.Now()
 	for i := 1; i < 10; i++ {
 		t.Run("MIGRATE - Cannot migrate async with timeout", func(t *testing.T) {
 			slot++
@@ -447,8 +447,8 @@ func TestSlotMigrateSync(t *testing.T) {
 			require.Equal(t, "PONG", rdb0.Ping(ctx).Val())
 		})
 	}
-	t_end := time.Now()
-	duration := t_end.Sub(t_begin)
+	tEnd := time.Now()
+	duration := tEnd.Sub(tBegin)
 	fmt.Println("MIGRATE duration: ", duration)
 }
 
