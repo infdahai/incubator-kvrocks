@@ -29,20 +29,20 @@ namespace redis {
 
 class CommandBZMPop : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandBZMPopMax : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandBZMPopMin : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZAdd : public Commander {
@@ -184,14 +184,14 @@ class CommandZCard : public Commander {
 
 class CommandZDiff : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZDiffStore : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZIncrBy : public Commander {
@@ -223,14 +223,14 @@ class CommandZIncrBy : public Commander {
 
 class CommandZInter : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZInterCard : public Commander {
  public:
-  Status Parse(const std::vector<std::string> &args) override {}
-  Status Execute(Server *svr, Connection *conn, std::string *output) override {}
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZLexCount : public Commander {
@@ -315,6 +315,12 @@ class CommandZPopMin : public CommandZPop {
 class CommandZPopMax : public CommandZPop {
  public:
   CommandZPopMax() : CommandZPop(false) {}
+};
+
+class CommandZRandMember : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZRangeGeneric : public Commander {
@@ -486,6 +492,12 @@ class CommandZRangeByScore : public CommandZRangeGeneric {
 class CommandZRevRangeByScore : public CommandZRangeGeneric {
  public:
   explicit CommandZRevRangeByScore() : CommandZRangeGeneric(kZRangeScore, kZRangeDirectionReverse) {}
+};
+
+class CommandZRangeStore : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
 };
 
 class CommandZRank : public Commander {
@@ -679,6 +691,12 @@ class CommandZMScore : public Commander {
   }
 };
 
+class CommandZUnion : public Commander {
+ public:
+  Status Parse(const std::vector<std::string> &args) override { return Status::OK(); }
+  Status Execute(Server *svr, Connection *conn, std::string *output) override { return Status::OK(); }
+};
+
 class CommandZUnionStore : public Commander {
  public:
   Status Parse(const std::vector<std::string> &args) override {
@@ -809,7 +827,7 @@ REDIS_REGISTER_COMMANDS(MakeCmdAttr<CommandBZMPop>("bzmpop", -5, "write", 1, 1, 
                         MakeCmdAttr<CommandZRange>("zrange", -4, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZRangeByLex>("zrangebylex", -4, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZRangeByScore>("zrangebyscore", -4, "read-only", 1, 1, 1),
-                        MakeCmdAttr<CommandZRangeStore>("zrangestore"), 
+                        MakeCmdAttr<CommandZRangeStore>("zrangestore", -4, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZRank>("zrank", 3, "read-only", 1, 1, 1),
                         MakeCmdAttr<CommandZRem>("zrem", -3, "write", 1, 1, 1),
                         MakeCmdAttr<CommandZRemRangeByLex>("zremrangebylex", 4, "write", 1, 1, 1),
