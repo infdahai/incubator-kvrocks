@@ -422,14 +422,21 @@ func TestSlotMigrateSync(t *testing.T) {
 			for _, timeout := range timeouts {
 				slot++
 				result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout)
+				var sleeptime int64
+				if timeout <= float32(0) {
+					sleeptime = 8
+				} else {
+					sleeptime = int64(timeout)
+				}
+				time.Sleep(time.Duration(sleeptime) * time.Second)
 				require.NoError(t, result.Err())
 				require.Equal(t, "OK", result.Val())
-				for result.Val() == nil && timeout < 15 {
-					timeout += 5
-					result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout)
-					require.NoError(t, result.Err())
-					require.Equal(t, "OK", result.Val())
-				}
+				// for result.Val() == nil && timeout < 15 {
+				// 	timeout += 5
+				// 	result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout)
+				// 	require.NoError(t, result.Err())
+				// 	require.Equal(t, "OK", result.Val())
+				// }
 			}
 		})
 
