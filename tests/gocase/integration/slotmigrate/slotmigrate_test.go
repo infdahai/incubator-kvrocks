@@ -413,23 +413,24 @@ func TestSlotMigrateSync(t *testing.T) {
 		})
 
 		t.Run("MIGRATE - Migrate sync with (or without) all kinds of timeouts", func(t *testing.T) {
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync").Val())
+			// migrate sync without explicitly specify the timeout
+			result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync")
+			require.NoError(t, result.Err())
+			require.Equal(t, "OK", result.Val())
 
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -1).Val())
-
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0).Val())
-
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 10).Val())
-
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", 0.5).Val())
-
-			slot++
-			require.Equal(t, "OK", rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", -3.14).Val())
+			timeouts := []float32{-1, 0, 10, 0.5, -3.14}
+			for _, timeout := range timeouts {
+				slot++
+				result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout)
+				require.NoError(t, result.Err())
+				require.Equal(t, "OK", result.Val())
+				for result.Val() == nil && timeout < 15 {
+					timeout += 5
+					result := rdb0.Do(ctx, "clusterx", "migrate", slot, id1, "sync", timeout)
+					require.NoError(t, result.Err())
+					require.Equal(t, "OK", result.Val())
+				}
+			}
 		})
 
 		t.Run("MIGRATE - Migrate sync timeout", func(t *testing.T) {
