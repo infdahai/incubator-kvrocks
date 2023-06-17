@@ -105,6 +105,9 @@ rocksdb::Status WriteBatchExtractor::PutCF(uint32_t column_family_id, const Slic
       resp_commands_[ns].emplace_back(redis::Command2RESP(command_args));
     }
 
+    if (metadata.Type() == kRedisHyperloglog) {
+    }
+
     return rocksdb::Status::OK();
   }
 

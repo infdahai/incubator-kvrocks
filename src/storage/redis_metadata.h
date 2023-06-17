@@ -41,6 +41,7 @@ enum RedisType {
   kRedisBitmap,
   kRedisSortedint,
   kRedisStream,
+  kRedisHyperloglog,
 };
 
 enum RedisCommand {
@@ -58,8 +59,8 @@ enum RedisCommand {
   kRedisCmdLMove,
 };
 
-const std::vector<std::string> RedisTypeNames = {"none", "string", "hash",      "list",  "set",
-                                                 "zset", "bitmap", "sortedint", "stream"};
+const std::vector<std::string> RedisTypeNames = {"none", "string", "hash",      "list",   "set",
+                                                 "zset", "bitmap", "sortedint", "stream", "hyperloglog"};
 
 constexpr const char *kErrMsgWrongType = "WRONGTYPE Operation against a key holding the wrong kind of value";
 constexpr const char *kErrMsgKeyExpired = "the key was expired";
@@ -193,6 +194,14 @@ class StreamMetadata : public Metadata {
   uint64_t entries_added = 0;
 
   explicit StreamMetadata(bool generate_version = true) : Metadata(kRedisStream, generate_version) {}
+
+  void Encode(std::string *dst) override;
+  rocksdb::Status Decode(const std::string &bytes) override;
+};
+
+class HyperloglogMetadata : public Metadata {
+ public:
+  explicit HyperloglogMetadata(bool generate_version = true) : Metadata(kRedisHyperloglog, generate_version) {}
 
   void Encode(std::string *dst) override;
   rocksdb::Status Decode(const std::string &bytes) override;
